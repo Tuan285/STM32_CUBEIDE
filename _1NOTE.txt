@@ -1,0 +1,24 @@
+------------ Cách thêm đường dẫn Inlude--------------
+Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU GCC Compiler -> Include Paths
+
+************** *ptr/ array *****************
+char s1[100] = "hello world\n"
+sizeof(s1) ->> 100
+
+char s[] = "hello world\n"	->> cấp phát bộ nhớ động
+sizeof(s) -->> 13
+
+*ptr = "hello world\n"	->> cấp phát bộ nhớ động
+strlen(ptr) ->> 13
+
+************clear buffer*******************
+memset(buffer, 0, index) ->> truyền giá trị 0 vào buffer 0-> index
+
+*********** UART IDLE *************
+truyền theo kiểu byte
+	|	address		|length			|data(n)			|check(SUM, CRC)
+	|	01 			| 01 			| 01 			| 03
+	|	01 			| 01 			| 02 			| 02
+
+*********** UART IT *************
+*********** UART DMA *************
