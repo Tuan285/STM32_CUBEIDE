@@ -1,0 +1,5 @@
+main.c:63:6:HAL_UARTEx_RxEventCallback	0	static
+main.c:71:9:Check_sum	8	static
+main.c:141:6:SystemClock_Config	72	static,ignoring_inline_asm
+main.c:84:5:main	56	static,ignoring_inline_asm
+main.c:233:6:Error_Handler	0	static,ignoring_inline_asm
