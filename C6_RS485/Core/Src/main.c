@@ -140,6 +140,7 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		// TODO
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		sendData(TxData);
 		HAL_Delay(1000);
