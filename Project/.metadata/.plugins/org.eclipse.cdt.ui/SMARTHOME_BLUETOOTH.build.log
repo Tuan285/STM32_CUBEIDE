@@ -1,0 +1,10 @@
+16:10:27 **** Incremental Build of configuration Debug for project SMARTHOME_BLUETOOTH ****
+make -j8 all 
+arm-none-eabi-size   SMARTHOME_BLUETOOTH.elf 
+   text	   data	    bss	    dec	    hex	filename
+  31556	    184	   2544	  34284	   85ec	SMARTHOME_BLUETOOTH.elf
+Finished building: default.size.stdout
+ 
+
+16:10:27 Build Finished. 0 errors, 0 warnings. (took 307ms)
+

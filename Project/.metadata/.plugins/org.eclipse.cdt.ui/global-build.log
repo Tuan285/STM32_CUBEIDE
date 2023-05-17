@@ -1,0 +1,35 @@
+06:03:56 **** Incremental Build of configuration Debug for project RFID ****
+make -j8 all 
+arm-none-eabi-size   RFID.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16384	     72	   1912	  18368	   47c0	RFID.elf
+Finished building: default.size.stdout
+ 
+06:04:47 **** Incremental Build of configuration Debug for project RFID ****
+make -j8 all 
+arm-none-eabi-size   RFID.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16384	     72	   1912	  18368	   47c0	RFID.elf
+Finished building: default.size.stdout
+ 
+06:05:20 **** Incremental Build of configuration Debug for project RFID ****
+make -j8 all 
+arm-none-eabi-size   RFID.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16384	     72	   1912	  18368	   47c0	RFID.elf
+Finished building: default.size.stdout
+ 
+06:05:35 **** Incremental Build of configuration Debug for project RFID ****
+make -j8 all 
+arm-none-eabi-size   RFID.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16384	     72	   1912	  18368	   47c0	RFID.elf
+Finished building: default.size.stdout
+ 
+06:06:00 **** Incremental Build of configuration Debug for project RFID ****
+make -j8 all 
+arm-none-eabi-size   RFID.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16384	     72	   1912	  18368	   47c0	RFID.elf
+Finished building: default.size.stdout
+ 

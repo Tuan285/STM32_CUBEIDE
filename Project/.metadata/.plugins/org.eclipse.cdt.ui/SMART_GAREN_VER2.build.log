@@ -1,0 +1,10 @@
+08:20:09 **** Incremental Build of configuration Debug for project SMART_GAREN_VER2 ****
+make -j8 all 
+arm-none-eabi-size   SMART_GAREN_VER2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  41684	    548	   2352	  44584	   ae28	SMART_GAREN_VER2.elf
+Finished building: default.size.stdout
+ 
+
+08:20:09 Build Finished. 0 errors, 0 warnings. (took 366ms)
+
