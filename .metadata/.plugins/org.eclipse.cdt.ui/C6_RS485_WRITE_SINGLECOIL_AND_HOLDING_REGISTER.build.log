@@ -1,0 +1,10 @@
+16:52:51 **** Incremental Build of configuration Debug for project C6_RS485_WRITE_SINGLECOIL_AND_HOLDING_REGISTER ****
+make -j8 all 
+arm-none-eabi-size   C6_RS485_WRITE_SINGLECOIL_AND_HOLDING_REGISTER.elf 
+   text	   data	    bss	    dec	    hex	filename
+   8956	     20	   1684	  10660	   29a4	C6_RS485_WRITE_SINGLECOIL_AND_HOLDING_REGISTER.elf
+Finished building: default.size.stdout
+ 
+
+16:52:51 Build Finished. 0 errors, 0 warnings. (took 222ms)
+

@@ -1,0 +1,14 @@
+asm_label=191,255,255
+c_braces=255,255,255
+c_default=255,136,136
+c_multi_line_comment=166,166,166
+c_operators=255,255,255
+c_single_line_comment=181,181,181
+eclipse.preferences.version=1
+markOccurrences=false
+org.eclipse.cdt.ui.text.templates.custom=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+sourceHoverBackgroundColor=45,45,45
+spelling_locale_initialized=true
+spelling_user_dictionary_encoding=Cp1258
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true

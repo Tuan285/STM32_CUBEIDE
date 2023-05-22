@@ -1,0 +1,17 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
+configDescList=org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:UART_IDLE_RECEIVE_BYTE Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485_COIL_AND_INPUT Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485_WRITE_SINGLECOIL_AND_HOLDING_REGISTER Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_SCAN_I2C Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:OLED Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485 Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_PWM_MOTOR Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_PWM Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RFID Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:RFID Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_UART_STRING Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Stepper_LAB49 Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:RIFD_CB_VATCAN Debug
+eclipse.preferences.version=1
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_I2C_LCD\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_I2C_LCD\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_PWM\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_PWM\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RFID\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485\ Debug/activeLaunchMode=debug
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485_COIL_AND_INPUT\ Debug/activeLaunchMode=debug
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_RS485_MASTER_COIL_AND_INPUT\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_SCAN_I2C\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:C6_UART_STRING\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:OLED\ Debug/activeLaunchMode=debug

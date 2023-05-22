@@ -78,8 +78,8 @@ void Error_Handler(void);
 #define BT1_GPIO_Port GPIOB
 #define BT4_Pin GPIO_PIN_13
 #define BT4_GPIO_Port GPIOB
-#define QUAT_Pin GPIO_PIN_3
-#define QUAT_GPIO_Port GPIOB
+#define BOM2_Pin GPIO_PIN_3
+#define BOM2_GPIO_Port GPIOB
 #define BOM_Pin GPIO_PIN_4
 #define BOM_GPIO_Port GPIOB
 #define DEN_Pin GPIO_PIN_5
@@ -93,5 +93,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

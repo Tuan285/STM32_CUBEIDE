@@ -22,11 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdbool.h"
-#include "stdio.h"
-#include "string.h"
-#include "i2c-lcd.h"
-#include "button.h"
+//#include "stdbool.h"
+#include "stdio.h"			// THU VIEN GHEP CHUOI
+#include "string.h"			// KIEU CHUOI
+#include "i2c-lcd.h"		// THU VIEN I2C LCD
+#include "button.h"			// THU VIEN N�?T NHẤN
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +54,7 @@ TIM_HandleTypeDef htim1;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-Button_t bt1, bt2, bt3, bt4;
+Button_t bt1, bt2, bt3, bt4;		// khai bao bien cho thu vien nut nhaj
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,7 +71,7 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void microDelay(uint16_t delay) {
+void microDelay(uint16_t delay) {		//SU DUNG TIMER1 DE DELAY MICRO SECOND
 	__HAL_TIM_SET_COUNTER(&htim1, 0);
 	while (__HAL_TIM_GET_COUNTER(&htim1) < delay)
 		;
@@ -83,12 +83,12 @@ uint64_t t_prev, t_prev2;
 #define DHT22_PIN GPIO_PIN_0
 uint8_t RH1, RH2, TC1, TC2, SUM, CHECK;
 uint32_t pMillis, cMillis;
-float tCelsius = 0;
 
+float tCelsius = 0;
 float tFahrenheit = 0;
 float RH = 0;
 
-uint8_t DHT22_Start(void) {
+uint8_t DHT22_Start(void) {		// KHOI TAO DHT22
 	uint8_t Response = 0;
 	GPIO_InitTypeDef GPIO_InitStructPrivate = { 0 };
 	GPIO_InitStructPrivate.Pin = DHT22_PIN;
@@ -96,17 +96,19 @@ uint8_t DHT22_Start(void) {
 	GPIO_InitStructPrivate.Speed = GPIO_SPEED_FREQ_LOW;
 	GPIO_InitStructPrivate.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStructPrivate); // set the pin as output
+
 	HAL_GPIO_WritePin(DHT22_PORT, DHT22_PIN, 0);   // pull the pin low
 	microDelay(1300);   // wait for 1300us
 	HAL_GPIO_WritePin(DHT22_PORT, DHT22_PIN, 1);   // pull the pin high
 	microDelay(30);   // wait for 30us
+
 	GPIO_InitStructPrivate.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStructPrivate.Pull = GPIO_PULLUP;
 	HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStructPrivate); // set the pin as input
 	microDelay(40);
-	if (!(HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN))) {
+	if (!(HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN))) { // NEU KO DOC DHT22 KHAC 1
 		microDelay(80);
-		if ((HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN)))
+		if ((HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN))) // NEU DOC DUOC DHT Response = 1;
 			Response = 1;
 	}
 	pMillis = HAL_GetTick();
@@ -116,7 +118,7 @@ uint8_t DHT22_Start(void) {
 	}
 	return Response;
 }
-uint8_t DHT22_Read(void) {
+uint8_t DHT22_Read(void) {		//
 	uint8_t a, b;
 	for (a = 0; a < 8; a++) {
 		pMillis = HAL_GetTick();
@@ -140,19 +142,20 @@ uint8_t DHT22_Read(void) {
 	return b;
 }
 void DHT22_value() {
-	if (DHT22_Start()) {
+	if (DHT22_Start()) {			// CHAY DHT THANH CONG
 		RH1 = DHT22_Read(); // First 8bits of humidity
 		RH2 = DHT22_Read(); // Second 8bits of Relative humidity
 		TC1 = DHT22_Read(); // First 8bits of Celsius
 		TC2 = DHT22_Read(); // Second 8bits of Celsius
 		SUM = DHT22_Read(); // Check sum
-		CHECK = RH1 + RH2 + TC1 + TC2;
+		CHECK = RH1 + RH2 + TC1 + TC2;		//
 		if (CHECK == SUM) {
 			if (TC1 > 127) // If TC1=10000000, negative temperature
 					{
 				tCelsius = (float) TC2 / 10 * (-1);
 			} else {
 				tCelsius = (float) ((TC1 << 8) | TC2) / 10;
+				// 16 bit:  0100 0010 0000 0000 | 0000 0000 0010 0001 = 0100 0010 0010 0001
 			}
 			tFahrenheit = tCelsius * 9 / 5 + 32;
 			RH = (float) ((RH1 << 8) | RH2) / 10;
@@ -260,10 +263,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 	HAL_UARTEx_ReceiveToIdle_IT(&huart1, DataRx, sizeof(DataRx));
 }
 void check() {
-	if (strcmp((char*) DataRx, "Bom1\r\n") == 0) {
-		bom = 1;
-	} else if (strcmp((char*) DataRx, "Bom0\r\n") == 0) {
-		bom = 0;
+	if (strcmp((char*) DataRx, "Bom1\r\n") == 0) {// neus esp gui ve "Bom1\r\n"
+		bom = 1;		// bat bom
+	} else if (strcmp((char*) DataRx, "Bom0\r\n") == 0) { // neus esp gui ve "Bom0\r\n"
+		bom = 0;		// tat bom
 	} else if (strcmp((char*) DataRx, "Quat0\r\n") == 0) {
 		quat = 0;
 	} else if (strcmp((char*) DataRx, "Quat1\r\n") == 0) {
@@ -272,8 +275,8 @@ void check() {
 		den = 0;
 	} else if (strcmp((char*) DataRx, "Den1\r\n") == 0) {
 		den = 1;
-	} else if (strcmp((char*) DataRx, "Trangthai0\r\n") == 0) {
-		tt = 0;
+	} else if (strcmp((char*) DataRx, "Trangthai0\r\n") == 0) {	// neus esp gui ve "Trangthai0\r\n"
+		tt = 0; // bat che do tu dong
 	} else if (strcmp((char*) DataRx, "Trangthai1\r\n") == 0) {
 		tt = 1;
 	}
@@ -399,17 +402,17 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-	Button_Init(&bt1, BT1_GPIO_Port, BT1_Pin);
+	Button_Init(&bt1, BT1_GPIO_Port, BT1_Pin);			//
 	Button_Init(&bt2, BT2_GPIO_Port, BT2_Pin);
 	Button_Init(&bt3, BT3_GPIO_Port, BT3_Pin);
 	Button_Init(&bt4, BT4_GPIO_Port, BT4_Pin);
 
-	HAL_UARTEx_ReceiveToIdle_IT(&huart1, DataRx, sizeof(DataRx));
+	HAL_UARTEx_ReceiveToIdle_IT(&huart1, DataRx, sizeof(DataRx));// khoi tao ngat nahn du lieu
 
-	HAL_ADC_Start_DMA(&hadc1, value_adc, 2);
-	HAL_ADCEx_Calibration_Start(&hadc1);
-	HAL_TIM_Base_Start(&htim1);
-	lcd_init();
+	HAL_ADC_Start_DMA(&hadc1, value_adc, 2);		// khoi tao doc analog
+	HAL_ADCEx_Calibration_Start(&hadc1);		// tinh toan analog
+	HAL_TIM_Base_Start(&htim1);			// chay timer 1
+	lcd_init();			// khoi tao chay lcd
 	lcd_goto_XY(1, 0);
 	lcd_send_string("XIN CHAO");
 	t_prev = HAL_GetTick();
@@ -418,53 +421,56 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	while (1) {
-		cb_mua = HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin);
-		if (HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin) == 0) {
-			stepper_step_angle(360, 1, 13);
+	while (1) {		// chay
+		cb_mua = HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin);	// doc cam bien mua
+		if (HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin) == 0) {// neu cam bien mua = 0
+			stepper_step_angle(360, 1, 13);		// donc co dong
 			check_cbmua = 1;
 			t_prev2 = HAL_GetTick();
 		}
-		if (HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin) == 1) {
+		if (HAL_GPIO_ReadPin(MUA_GPIO_Port, MUA_Pin) == 1) {// neu kko mua thi dong lai
 			if (check_cbmua == 1) {
 				if (HAL_GetTick() - t_prev2 >= 2000) {
-					stepper_step_angle(360, 0, 13);
+					stepper_step_angle(360, 0, 13);		// dong co dong
 					check_cbmua = 0;
 				}
 			}
 		}
-		bt_handle(&bt1);
+		bt_handle(&bt1);		// ktra nut nhan
 		bt_handle(&bt2);
 		bt_handle(&bt3);
 		bt_handle(&bt4);
-		on_off_led(bom, quat, den);
-		if (flag == 1) {
+		on_off_led(bom, quat, den);		// bat tat thiet bi
+		if (flag == 1) {		// neu nhan duoc du lieu
 			check();
 			memset(DataRx, 0, strlen((char*) DataRx));
 			flag = 0;
 		}
-		if (HAL_GetTick() - t_prev >= 100) {
-			DHT22_value();
+		if (HAL_GetTick() - t_prev >= 100) {	// moi 100ms se cho chay 1 lan
+			DHT22_value();		// doc dht
 			HAL_ADC_Start_DMA(&hadc1, value_adc, 2);
 			DAD = map(value_adc[0], 0, 4096, 0, 100);
-			if (tt == 0) {
-				if (tCelsius >= 30) {
-					quat = 1;
+			if (tt == 0) {		// dang o che do tu dong
+				if (tCelsius >= 30) {		// nhiet do lon hon 30
+					quat = 1;			// quat bat
 				}
 				if (tCelsius < 30) {
 					quat = 0;
 				}
-//				if (value_adc >= 2500) {
-//					bom = 1;
-//				}
-//				if (value_adc < 2500) {
-//					bom = 0;
-//				}
+
+				if (value_adc >= 2500) {		// cam bien anh sang
+					den  = 1;
+				}
+				if (value_adc < 2500) {
+					den = 0;
+				}
 			}
-			show_lcd();
+			show_lcd();		// hien thi lcd
+			// gui len esp
 			sprintf((char*) buffer, "%.1f/%.1f/%d/%d/%d/%d/%d\n", tCelsius, RH,
 					DAD, bom, quat, den, tt);
-			HAL_UART_Transmit(&huart1, buffer, strlen((char*) buffer), 1000);
+			/// ghep chuoi duoi bao gom nhung du lieu : nhiet do, do am, do am dat, ...
+			HAL_UART_Transmit(&huart1, buffer, strlen((char*) buffer), 1000);// gui chuoi len esp
 			t_prev = HAL_GetTick();
 		}
 
@@ -499,6 +505,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -537,6 +544,7 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 1 */
 
   /* USER CODE END ADC1_Init 1 */
+
   /** Common config
   */
   hadc1.Instance = ADC1;
@@ -550,6 +558,7 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure Regular Channel
   */
   sConfig.Channel = ADC_CHANNEL_9;
@@ -559,6 +568,7 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure Regular Channel
   */
   sConfig.Channel = ADC_CHANNEL_3;
@@ -721,7 +731,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, IN4_Pin|IN3_Pin|IN2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, QUAT_Pin|BOM_Pin|DEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, BOM2_Pin|BOM_Pin|DEN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : DHT22_Pin */
   GPIO_InitStruct.Pin = DHT22_Pin;
@@ -754,8 +764,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : QUAT_Pin BOM_Pin DEN_Pin */
-  GPIO_InitStruct.Pin = QUAT_Pin|BOM_Pin|DEN_Pin;
+  /*Configure GPIO pins : BOM2_Pin BOM_Pin DEN_Pin */
+  GPIO_InitStruct.Pin = BOM2_Pin|BOM_Pin|DEN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -797,5 +807,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -9,6 +9,12 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="D:\STM32\STM32_CUBEIDE\Project\SMART_GAREN_2"/>
+			<item value="D:\STM32\STM32_CUBEIDE\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER"/>
+			<item value="C:\Users\admin\Documents\Zalo Received Files\SMART_GAREN"/>
+			<item value="E:\Downloads\modbus_writing_coils\modbus_writing_coils"/>
+			<item value="D:\STM32\STM32_CUBEIDE\RIFD_CB_VATCAN\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER"/>
+			<item value="E:\Downloads\SMARTHOME_BLUETOOTH (1)"/>
 			<item value="D:\STM32\STM32_CUBEIDE\dustsensor"/>
 			<item value="D:\STM32\STM32_CUBEIDE\RIFD_CB_VATCAN"/>
 		</list>
