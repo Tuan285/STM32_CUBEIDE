@@ -221,10 +221,10 @@ void on_off_led(uint8_t b, uint8_t q, uint8_t d) {
 	}
 	switch (q) {
 	case 1:
-		HAL_GPIO_WritePin(QUAT_GPIO_Port, QUAT_Pin, 1);
+		HAL_GPIO_WritePin(BOM2_GPIO_Port, BOM2_Pin, 1);
 		break;
 	case 0:
-		HAL_GPIO_WritePin(QUAT_GPIO_Port, QUAT_Pin, 0);
+		HAL_GPIO_WritePin(BOM2_GPIO_Port, BOM2_Pin, 0);
 		break;
 	default:
 		break;
@@ -458,10 +458,10 @@ int main(void)
 					quat = 0;
 				}
 
-				if (value_adc >= 2500) {		// cam bien anh sang
+				if (value_adc[1] >= 2500) {		// cam bien anh sang
 					den  = 1;
 				}
-				if (value_adc < 2500) {
+				if (value_adc[1] < 2500) {
 					den = 0;
 				}
 			}

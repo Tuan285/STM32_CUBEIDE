@@ -60,8 +60,8 @@ all: main-build
 main-build: C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.elf secondary-outputs
 
 # Tool invocations
-C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.elf C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.map: $(OBJS) $(USER_OBJS) D:\STM32\STM32_CUBEIDE\RIFD_CB_VATCAN\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\STM32\STM32_CUBEIDE\RIFD_CB_VATCAN\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.elf C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.map: $(OBJS) $(USER_OBJS) D:\STM32\STM32_CUBEIDE\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\STM32\STM32_CUBEIDE\C8_RS485_WRITE_MULTI_COIL_AND_REGISTER\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="C8_RS485_WRITE_MULTI_COIL_AND_REGISTER.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
