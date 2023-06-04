@@ -112,10 +112,10 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
  800017c:	20000144 	.word	0x20000144
 
 08000180 <_write>:
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 uint8_t DataRx;
-//void SendData(char *data) {
-//	HAL_UART_Transmit(&huart1, (uint8_t*) data, strlen(data), 1000);
-//}
+
 #if defined(__GNUC__)
 int _write(int fd, char *ptr, int len) {
  8000180:	b580      	push	{r7, lr}
