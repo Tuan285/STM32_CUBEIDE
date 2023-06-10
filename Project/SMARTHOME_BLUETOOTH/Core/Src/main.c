@@ -80,7 +80,7 @@ static void MX_TIM4_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define STEPPER_MOTOR1   0
+#define STEPPER_MOTOR1 0
 uint64_t t_prev = 0;
 uint8_t bufferTx[32];
 uint8_t DataRx;
@@ -89,46 +89,56 @@ uint8_t buffer[DataSize];
 uint8_t indexx = 0;
 uint8_t flag = 0;
 uint32_t value_Adc[3];
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	STEPPER_TMR_OVF_ISR(htim);
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  STEPPER_TMR_OVF_ISR(htim);
 }
-long map(long x, long in_min, long in_max, long out_min, long out_max) {
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+long map(long x, long in_min, long in_max, long out_min, long out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-	flag = 1;
-	HAL_UARTEx_ReceiveToIdle_IT(&huart1, buffer, DataSize);
-}
-
-void microDelay(uint16_t delay) {
-	__HAL_TIM_SET_COUNTER(&htim1, 0);
-	while (__HAL_TIM_GET_COUNTER(&htim1) < delay)
-		;
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+  flag = 1;
+  HAL_UARTEx_ReceiveToIdle_IT(&huart1, buffer, DataSize);
 }
 
-uint16_t Filter(uint16_t m) {
-	static uint16_t flag_first = 0, _buff[10], sum;
-	const uint16_t _buff_max = 10;
-	int i;
+void microDelay(uint16_t delay)
+{
+  __HAL_TIM_SET_COUNTER(&htim1, 0);
+  while (__HAL_TIM_GET_COUNTER(&htim1) < delay)
+    ;
+}
 
-	if (flag_first == 0) {
-		flag_first = 1;
-		for (i = 0, sum = 0; i < _buff_max; i++) {
-			_buff[i] = m;
-			sum += _buff[i];
-		}
-		return m;
-	} else {
-		sum -= _buff[0];
-		for (i = 0; i < (_buff_max - 1); i++) {
-			_buff[i] = _buff[i + 1];
-		}
-		_buff[9] = m;
-		sum += _buff[9];
+uint16_t Filter(uint16_t m)
+{
+  static uint16_t flag_first = 0, _buff[10], sum;
+  const uint16_t _buff_max = 10;
+  int i;
 
-		i = sum / 10.0;
-		return i;
-	}
+  if (flag_first == 0)
+  {
+    flag_first = 1;
+    for (i = 0, sum = 0; i < _buff_max; i++)
+    {
+      _buff[i] = m;
+      sum += _buff[i];
+    }
+    return m;
+  }
+  else
+  {
+    sum -= _buff[0];
+    for (i = 0; i < (_buff_max - 1); i++)
+    {
+      _buff[i] = _buff[i + 1];
+    }
+    _buff[9] = m;
+    sum += _buff[9];
+
+    i = sum / 10.0;
+    return i;
+  }
 }
 
 // ------------------ MQ135 ----------------------
@@ -136,34 +146,39 @@ uint16_t Filter(uint16_t m) {
 uint32_t value_MQ, value_MQs;
 float voltage;
 #define SharpGP2Y10_SAMPLINGTIME 280
-uint16_t value_Gp2y10(uint16_t value) {
-	uint16_t value_Dust;
-	value = Filter(value);
-	voltage = (3300 / 4096.0) * value * 11;
-	value_Dust = 0.17 * voltage - 0.1;
-	return value_Dust;
+uint16_t value_Gp2y10(uint16_t value)
+{
+  uint16_t value_Dust;
+  value = Filter(value);
+  voltage = (3300 / 4096.0) * value * 11;
+  value_Dust = 0.17 * voltage - 0.1;
+  return value_Dust;
 }
 
 // ------------------ CO2 ----------------------
 uint32_t dustDensity, dustDensitys;
 #define co2Zero 55
 uint16_t count = 0;
-int co2raw = 0;                               //int for raw value of co2
-int co2comp = 0;                              //int for compensated co2
+int co2raw = 0;  // int for raw value of co2
+int co2comp = 0; // int for compensated co2
 int co2ppm = 0;
 uint32_t co2now;
-uint16_t get_PPM(uint16_t value_mq) {
-	if (count == 10) {
-		count = 0;
-		co2raw = co2now / 10.0;
-		co2comp = co2raw - co2Zero;
-		co2ppm = map(co2comp, 0, 4096, 400, 5000);
-		co2now = 0;
-	} else {
-		co2now += value_mq;
-		count++;
-	}
-	return co2ppm;
+uint16_t get_PPM(uint16_t value_mq)
+{
+  if (count == 10)
+  {
+    count = 0;
+    co2raw = co2now / 10.0;
+    co2comp = co2raw - co2Zero;
+    co2ppm = map(co2comp, 0, 4096, 400, 5000);
+    co2now = 0;
+  }
+  else
+  {
+    co2now += value_mq;
+    count++;
+  }
+  return co2ppm;
 }
 
 uint8_t khach = 0;
@@ -172,188 +187,251 @@ uint8_t tam = 0;
 uint8_t hanhlang = 0;
 uint8_t tt_rem;
 uint8_t tt_manual;
-void control() {
-	if (strcmp((char*) buffer, "MOKHACH\r\n") == 0) {
-		khach = 1;
-	} else if (strcmp((char*) buffer, "ROKHACH\r\n") == 0) {
-		khach = 2;
-	} else if (strcmp((char*) buffer, "OFFKHACH\r\n") == 0) {
-		khach = 3;
-	} else if (strcmp((char*) buffer, "MONGU\r\n") == 0) {
-		ngu = 1;
-	} else if (strcmp((char*) buffer, "RONGU\r\n") == 0) {
-		ngu = 2;
-	} else if (strcmp((char*) buffer, "OFFNGU\r\n") == 0) {
-		ngu = 3;
-	} else if (strcmp((char*) buffer, "ONLANG\r\n") == 0) {
-		hanhlang = 1;
-	} else if (strcmp((char*) buffer, "OFFLANG\r\n") == 0) {
-		hanhlang = 0;
-	} else if (strcmp((char*) buffer, "ONTAM\r\n") == 0) {
-		tam = 1;
-	} else if (strcmp((char*) buffer, "OFFTAM\r\n") == 0) {
-		tam = 0;
-	} else if (strcmp((char*) buffer, "ONREM\r\n") == 0) {
-		tt_rem = 1;
-	} else if (strcmp((char*) buffer, "OFFREM\r\n") == 0) {
-		tt_rem = 0;
-	} else if (strcmp((char*) buffer, "MANUAL\r\n") == 0) {
-		tt_manual = 1;
-	} else if (strcmp((char*) buffer, "AUTO\r\n") == 0) {
-		tt_manual = 0;
-	}
+void control()
+{
+  if (strcmp((char *)buffer, "MOKHACH\r\n") == 0)
+  {
+    khach = 1;
+  }
+  else if (strcmp((char *)buffer, "ROKHACH\r\n") == 0)
+  {
+    khach = 2;
+  }
+  else if (strcmp((char *)buffer, "OFFKHACH\r\n") == 0)
+  {
+    khach = 3;
+  }
+  else if (strcmp((char *)buffer, "MONGU\r\n") == 0)
+  {
+    ngu = 1;
+  }
+  else if (strcmp((char *)buffer, "RONGU\r\n") == 0)
+  {
+    ngu = 2;
+  }
+  else if (strcmp((char *)buffer, "OFFNGU\r\n") == 0)
+  {
+    ngu = 3;
+  }
+  else if (strcmp((char *)buffer, "ONLANG\r\n") == 0)
+  {
+    hanhlang = 1;
+  }
+  else if (strcmp((char *)buffer, "OFFLANG\r\n") == 0)
+  {
+    hanhlang = 0;
+  }
+  else if (strcmp((char *)buffer, "ONTAM\r\n") == 0)
+  {
+    tam = 1;
+  }
+  else if (strcmp((char *)buffer, "OFFTAM\r\n") == 0)
+  {
+    tam = 0;
+  }
+  else if (strcmp((char *)buffer, "ONREM\r\n") == 0)
+  {
+    tt_rem = 1;
+  }
+  else if (strcmp((char *)buffer, "OFFREM\r\n") == 0)
+  {
+    tt_rem = 0;
+  }
+  else if (strcmp((char *)buffer, "MANUAL\r\n") == 0)
+  {
+    tt_manual = 1;
+  }
+  else if (strcmp((char *)buffer, "AUTO\r\n") == 0)
+  {
+    tt_manual = 0;
+  }
 }
-void sendData() {
-	sprintf((char*) bufferTx, "%ld;%ld;\n", dustDensity, value_MQ);
-	HAL_UART_Transmit(&huart1, (uint8_t*) bufferTx, strlen((char*) bufferTx),
-			1000);
+void sendData()
+{
+  sprintf((char *)bufferTx, "%ld;%ld;\n", dustDensity, value_MQ);
+  HAL_UART_Transmit(&huart1, (uint8_t *)bufferTx, strlen((char *)bufferTx),
+                    1000);
 }
-void OnOffLed(uint8_t k, uint8_t n, uint8_t l, uint8_t t) {
-	switch (k) {
-	case 1:
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
-		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
-//		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
-		break;
-	case 2:
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
-		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
-		break;
-	case 3:
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);
-		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
-//		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
-		break;
-	default:
-		break;
-	}
-	switch (n) {
-	case 1:
-		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 1);
-		HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 0);
-		break;
-	case 2:
-		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 1);
-		HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 1);
-		break;
-	case 3:
-		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 0);
-		HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 0);
-		break;
-	default:
-		break;
-	}
-	switch (t) {
-	case 0:
-		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, 0);
-		break;
-	case 1:
-		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, 1);
-		break;
-	default:
-		break;
-	}
-	switch (l) {
-	case 0:
-		HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, 0);
-		break;
-	case 1:
-		HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, 1);
-		break;
-	default:
-		break;
-	}
+void OnOffLed(uint8_t k, uint8_t n, uint8_t l, uint8_t t)
+{
+  switch (k)
+  {
+  case 1:
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
+    //		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
+    break;
+  case 2:
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
+    break;
+  case 3:
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
+    //		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
+    break;
+  default:
+    break;
+  }
+  switch (n)
+  {
+  case 1:
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 1);
+    HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 0);
+    break;
+  case 2:
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 1);
+    HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 1);
+    break;
+  case 3:
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, 0);
+    HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, 0);
+    break;
+  default:
+    break;
+  }
+  switch (t)
+  {
+  case 0:
+    HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, 0);
+    break;
+  case 1:
+    HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, 1);
+    break;
+  default:
+    break;
+  }
+  switch (l)
+  {
+  case 0:
+    HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, 0);
+    break;
+  case 1:
+    HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, 1);
+    break;
+  default:
+    break;
+  }
 }
 uint8_t value1[50], value2[50];
-void show_lcd() {
-	lcd_clear_display();
-	HAL_Delay(10);
-	sprintf((char*) value1, "BUI : %d ", dustDensity);
-	sprintf((char*) value2, "CO2 : %d ", value_MQ);
+void show_lcd()
+{
+  lcd_clear_display();
+  HAL_Delay(10);
+  sprintf((char *)value1, "BUI : %d ", dustDensity);
+  sprintf((char *)value2, "CO2 : %d ", value_MQ);
 
-	lcd_goto_XY(1, 0);
-	lcd_send_string((char*) value1);
-	lcd_goto_XY(2, 0);
-	lcd_send_string((char*) value2);
+  lcd_goto_XY(1, 0);
+  lcd_send_string((char *)value1);
+  lcd_goto_XY(2, 0);
+  lcd_send_string((char *)value2);
 }
 uint8_t but1, but2, but3, but4, but5;
 uint8_t tt_manual;
-void bt_press_callback(Button_t *button) {
-	if (button == &bt1) {
-		if (but1 == 4) {
-			but1 = 1;
-		}
-		switch (but1) {
-		case 1:
-			khach = 1;
-			break;
-		case 2:
-			khach = 2;
-			break;
-		case 3:
-			khach = 3;
-			break;
-		default:
-			break;
-		}
-		but1++;
-	} else if (button == &bt2) {
-		if (but2 == 4) {
-			but2 = 1;
-		}
-		switch (but2) {
-		case 1:
-			ngu = 1;
-			break;
-		case 2:
-			ngu = 2;
-			break;
-		case 3:
-			ngu = 3;
-			break;
-		default:
-			break;
-		}
-		but2++;
-	}
-	if (tt_manual == 1) {
-		if (button == &bt3) {
-			if (tam == 1) {
-				tam = 0;
-			} else {
-				tam = 1;
-			}
-		} else if (button == &bt4) {
-			if (hanhlang == 1) {
-				hanhlang = 0;
-			} else {
-				hanhlang = 1;
-			}
-		} else if (button == &bt5) {			// REM
-			if (tt_rem == 1) {
-				STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
-				tt_rem = 0;
-			} else {
-				STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
-				tt_rem = 1;
-			}
-		}
-	} else if (button == &bt6) {
-		if (tt_manual == 1) {
-			tt_manual = 0;
-		} else {
-			tt_manual = 1;
-		}
-	}
+void bt_press_callback(Button_t *button)
+{
+  if (button == &bt1)
+  {
+    if (but1 == 4)
+    {
+      but1 = 1;
+    }
+    switch (but1)
+    {
+    case 1:
+      khach = 1;
+      break;
+    case 2:
+      khach = 2;
+      break;
+    case 3:
+      khach = 3;
+      break;
+    default:
+      break;
+    }
+    but1++;
+  }
+  else if (button == &bt2)
+  {
+    if (but2 == 4)
+    {
+      but2 = 1;
+    }
+    switch (but2)
+    {
+    case 1:
+      ngu = 1;
+      break;
+    case 2:
+      ngu = 2;
+      break;
+    case 3:
+      ngu = 3;
+      break;
+    default:
+      break;
+    }
+    but2++;
+  }
+  if (tt_manual == 1)
+  {
+    if (button == &bt3)
+    {
+      if (tam == 1)
+      {
+        tam = 0;
+      }
+      else
+      {
+        tam = 1;
+      }
+    }
+    else if (button == &bt4)
+    {
+      if (hanhlang == 1)
+      {
+        hanhlang = 0;
+      }
+      else
+      {
+        hanhlang = 1;
+      }
+    }
+    else if (button == &bt5)
+    { // REM
+      if (tt_rem == 1)
+      {
+        STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
+        tt_rem = 0;
+      }
+      else
+      {
+        STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
+        tt_rem = 1;
+      }
+    }
+  }
+  else if (button == &bt6)
+  {
+    if (tt_manual == 1)
+    {
+      tt_manual = 0;
+    }
+    else
+    {
+      tt_manual = 1;
+    }
+  }
 }
 uint8_t tt_rem1, cb_vatcan, tt_tam;
 uint8_t s1, s2, s3, s4, s5, s6;
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -386,105 +464,122 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-	Button_Init(&bt1, BT1_GPIO_Port, BT1_Pin);
-	Button_Init(&bt2, BT2_GPIO_Port, BT2_Pin);
-	Button_Init(&bt3, BT3_GPIO_Port, BT3_Pin);
-	Button_Init(&bt4, BT4_GPIO_Port, BT4_Pin);
-	Button_Init(&bt5, BT5_GPIO_Port, BT5_Pin);
-	Button_Init(&bt6, BT6_GPIO_Port, BT6_Pin);
-	STEPPERS_Init_TMR(&htim4);
-	STEPPER_SetSpeed(STEPPER_MOTOR1, 20);
+  Button_Init(&bt1, BT1_GPIO_Port, BT1_Pin);
+  Button_Init(&bt2, BT2_GPIO_Port, BT2_Pin);
+  Button_Init(&bt3, BT3_GPIO_Port, BT3_Pin);
+  Button_Init(&bt4, BT4_GPIO_Port, BT4_Pin);
+  Button_Init(&bt5, BT5_GPIO_Port, BT5_Pin);
+  Button_Init(&bt6, BT6_GPIO_Port, BT6_Pin);
+  STEPPERS_Init_TMR(&htim4);
+  STEPPER_SetSpeed(STEPPER_MOTOR1, 20);
 
-	HAL_UARTEx_ReceiveToIdle_IT(&huart1, buffer, DataSize);
-	HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_UARTEx_ReceiveToIdle_IT(&huart1, buffer, DataSize);
+  HAL_ADCEx_Calibration_Start(&hadc1);
 
-	HAL_TIM_Base_Start(&htim1);
-	lcd_init();
-	t_prev = HAL_GetTick();
+  HAL_TIM_Base_Start(&htim1);
+  lcd_init();
+  t_prev = HAL_GetTick();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	while (1) {
-		bt_handle(&bt1);
-		bt_handle(&bt2);
-		bt_handle(&bt3);
-		bt_handle(&bt4);
-		bt_handle(&bt5);
-		bt_handle(&bt6);
-		s1 = HAL_GPIO_ReadPin(BT1_GPIO_Port, BT1_Pin);
-		s2 = HAL_GPIO_ReadPin(BT2_GPIO_Port, BT2_Pin);
-		s3 = HAL_GPIO_ReadPin(BT3_GPIO_Port, BT3_Pin);
-		s4 = HAL_GPIO_ReadPin(BT4_GPIO_Port, BT4_Pin);
-		s5 = HAL_GPIO_ReadPin(BT5_GPIO_Port, BT5_Pin);
-		s6 = HAL_GPIO_ReadPin(BT6_GPIO_Port, BT6_Pin);
-		if (flag == 1) {				// check Rx
-			control();
-			if (tt_manual == 1) {
-				if (tt_rem == 1) {
-					STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
-					tt_rem = 0;
-				} else {
-					STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
-					tt_rem = 1;
-				}
-			}
-			memset(buffer, 0, strlen((char*) buffer));
-			flag = 0;
-		}
-		OnOffLed(khach, ngu, hanhlang, tam);
-		if (HAL_GetTick() - t_prev >= 300) {
+  while (1)
+  {
+    bt_handle(&bt1);
+    bt_handle(&bt2);
+    bt_handle(&bt3);
+    bt_handle(&bt4);
+    bt_handle(&bt5);
+    bt_handle(&bt6);
+    s1 = HAL_GPIO_ReadPin(BT1_GPIO_Port, BT1_Pin);
+    s2 = HAL_GPIO_ReadPin(BT2_GPIO_Port, BT2_Pin);
+    s3 = HAL_GPIO_ReadPin(BT3_GPIO_Port, BT3_Pin);
+    s4 = HAL_GPIO_ReadPin(BT4_GPIO_Port, BT4_Pin);
+    s5 = HAL_GPIO_ReadPin(BT5_GPIO_Port, BT5_Pin);
+    s6 = HAL_GPIO_ReadPin(BT6_GPIO_Port, BT6_Pin);
+    if (flag == 1)
+    { // check Rx
+      control();
+      if (tt_manual == 1)
+      {
+        if (tt_rem == 1)
+        {
+          STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
+          tt_rem = 0;
+        }
+        else
+        {
+          STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
+          tt_rem = 1;
+        }
+      }
+      memset(buffer, 0, strlen((char *)buffer));
+      flag = 0;
+    }
+    OnOffLed(khach, ngu, hanhlang, tam);
+    if (HAL_GetTick() - t_prev >= 300)
+    {
 
-			HAL_GPIO_WritePin(LED_BUI_GPIO_Port, LED_BUI_Pin, GPIO_PIN_SET);
-			microDelay(SharpGP2Y10_SAMPLINGTIME);
-			HAL_ADC_Start_DMA(&hadc1, value_Adc, 3);
-			HAL_GPIO_WritePin(LED_BUI_GPIO_Port, LED_BUI_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(LED_BUI_GPIO_Port, LED_BUI_Pin, GPIO_PIN_SET);
+      microDelay(SharpGP2Y10_SAMPLINGTIME);
+      HAL_ADC_Start_DMA(&hadc1, value_Adc, 3);
+      HAL_GPIO_WritePin(LED_BUI_GPIO_Port, LED_BUI_Pin, GPIO_PIN_RESET);
 
-			dustDensity = value_Gp2y10(value_Adc[0]);
-			value_MQ = get_PPM(value_Adc[1]);
+      dustDensity = value_Gp2y10(value_Adc[0]);
+      value_MQ = get_PPM(value_Adc[1]);
 
-			sendData();		// send data to Hc-05
-			t_prev = HAL_GetTick();
-		}
-		if (value_MQ != value_MQs) {
-			value_MQs = value_MQ;
-			dustDensitys = dustDensity;
-			show_lcd();
-		}
-		if (tt_manual == 0) {
-			cb_vatcan = HAL_GPIO_ReadPin(CD_GPIO_Port, CD_Pin);
-			if (cb_vatcan == 0) {
-				tam = 1;
-			} else if (cb_vatcan == 1) {
-				tam = 0;
-			}
-			if (value_Adc[2] > 1500) {			// thay doi gia tri anh sang
-				hanhlang = 1;
-				if (tt_rem1 == 0) {
-					tt_rem1 = 1;
-					STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
-				}
-			} else {
-				hanhlang = 0;
-				if (tt_rem1 == 1) {
-					tt_rem1 = 0;
-					STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
-				}
-			}
-		}
+      sendData(); // send data to Hc-05
+      t_prev = HAL_GetTick();
+    }
+    if (value_MQ != value_MQs)
+    {
+      value_MQs = value_MQ;
+      dustDensitys = dustDensity;
+      show_lcd();
+    }
+    if (tt_manual == 0)
+    {
+      cb_vatcan = HAL_GPIO_ReadPin(CD_GPIO_Port, CD_Pin);
+      if (cb_vatcan == 0)
+      {
+        tam = 1;
+      }
+      else if (cb_vatcan == 1)
+      {
+        tam = 0;
+      }
+      if (value_Adc[2] > 1500)
+      { // thay doi gia tri anh sang
+        hanhlang = 1;
+        if (tt_rem1 == 0)
+        {
+          tt_rem1 = 1;
+          STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CW);
+        }
+      }
+      else
+      {
+        hanhlang = 0;
+        if (tt_rem1 == 1)
+        {
+          tt_rem1 = 0;
+          STEPPER_Step_NonBlocking(STEPPER_MOTOR1, 4000, DIR_CCW);
+        }
+      }
+    }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	}
+  }
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -492,8 +587,8 @@ void SystemClock_Config(void)
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
@@ -506,9 +601,8 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -527,10 +621,10 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief ADC1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_ADC1_Init(void)
 {
 
@@ -544,7 +638,7 @@ static void MX_ADC1_Init(void)
 
   /* USER CODE END ADC1_Init 1 */
   /** Common config
-  */
+   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -557,7 +651,7 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /** Configure Regular Channel
-  */
+   */
   sConfig.Channel = ADC_CHANNEL_6;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
@@ -566,7 +660,7 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /** Configure Regular Channel
-  */
+   */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = ADC_REGULAR_RANK_2;
   sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
@@ -575,7 +669,7 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /** Configure Regular Channel
-  */
+   */
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = ADC_REGULAR_RANK_3;
   sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
@@ -586,14 +680,13 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_I2C1_Init(void)
 {
 
@@ -620,14 +713,13 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
-  * @brief TIM1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_TIM1_Init(void)
 {
 
@@ -642,9 +734,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 72-1;
+  htim1.Init.Prescaler = 72 - 1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0xffff-1;
+  htim1.Init.Period = 0xffff - 1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -666,14 +758,13 @@ static void MX_TIM1_Init(void)
   /* USER CODE BEGIN TIM1_Init 2 */
 
   /* USER CODE END TIM1_Init 2 */
-
 }
 
 /**
-  * @brief TIM2 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM2 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_TIM2_Init(void)
 {
 
@@ -689,9 +780,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 72-1;
+  htim2.Init.Prescaler = 72 - 1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 20000-1;
+  htim2.Init.Period = 20000 - 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -725,14 +816,13 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
-
 }
 
 /**
-  * @brief TIM4 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief TIM4 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_TIM4_Init(void)
 {
 
@@ -770,14 +860,13 @@ static void MX_TIM4_Init(void)
   /* USER CODE BEGIN TIM4_Init 2 */
 
   /* USER CODE END TIM4_Init 2 */
-
 }
 
 /**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief USART1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_USART1_UART_Init(void)
 {
 
@@ -803,12 +892,11 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
-
 }
 
 /**
-  * Enable DMA controller clock
-  */
+ * Enable DMA controller clock
+ */
 static void MX_DMA_Init(void)
 {
 
@@ -819,14 +907,13 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -841,11 +928,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, IN4_Pin|LED5_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, IN4_Pin | LED5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, IN3_Pin|IN2_Pin|IN1_Pin|LED6_Pin
-                          |LED4_Pin|LED1_Pin|LED_BUI_Pin|LED2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, IN3_Pin | IN2_Pin | IN1_Pin | LED6_Pin | LED4_Pin | LED1_Pin | LED_BUI_Pin | LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED3_Pin */
   GPIO_InitStruct.Pin = LED3_Pin;
@@ -861,7 +947,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(CD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : IN4_Pin LED5_Pin */
-  GPIO_InitStruct.Pin = IN4_Pin|LED5_Pin;
+  GPIO_InitStruct.Pin = IN4_Pin | LED5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -869,25 +955,23 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : IN3_Pin IN2_Pin IN1_Pin LED6_Pin
                            LED4_Pin LED1_Pin LED_BUI_Pin LED2_Pin */
-  GPIO_InitStruct.Pin = IN3_Pin|IN2_Pin|IN1_Pin|LED6_Pin
-                          |LED4_Pin|LED1_Pin|LED_BUI_Pin|LED2_Pin;
+  GPIO_InitStruct.Pin = IN3_Pin | IN2_Pin | IN1_Pin | LED6_Pin | LED4_Pin | LED1_Pin | LED_BUI_Pin | LED2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BT6_Pin BT1_Pin BT2_Pin */
-  GPIO_InitStruct.Pin = BT6_Pin|BT1_Pin|BT2_Pin;
+  GPIO_InitStruct.Pin = BT6_Pin | BT1_Pin | BT2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BT5_Pin BT4_Pin BT3_Pin */
-  GPIO_InitStruct.Pin = BT5_Pin|BT4_Pin|BT3_Pin;
+  GPIO_InitStruct.Pin = BT5_Pin | BT4_Pin | BT3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 4 */
@@ -895,27 +979,28 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
-	__disable_irq();
-	while (1) {
-	}
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
